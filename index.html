@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1b1224">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E💗%3C/text%3E%3C/svg%3E">
+<title>FicLaboratory</title>
+</head>
+<body>
+
+<header class="topbar">
+  <span class="logo">💗</span>
+  <h1>FicLaboratory</h1>
+</header>
+
+<main>
+
+  <!-- KEZDŐLAP -->
+  <section class="page active" id="page-home">
+    <div class="hero">
+      <h2>Üdv a laborban</h2>
+      <p>A ficeid offline, egy helyen, a saját olvasóddal.</p>
+    </div>
+    <div class="stats">
+      <div><b id="stat-books">0</b><span>Könyv</span></div>
+      <div><b id="stat-chapters">0</b><span>Fejezet</span></div>
+      <div><b id="stat-favorites">0</b><span>Kedvenc</span></div>
+      <div><b id="stat-followed">0</b><span>Követett</span></div>
+    </div>
+    <div class="card">
+      <h3>Folytatás</h3>
+      <div id="continue-box"><p class="muted">Még nem olvastál semmit.</p></div>
+    </div>
+  </section>
+
+  <!-- KÖNYVTÁR -->
+  <section class="page" id="page-library">
+    <h2>Könyvtár</h2>
+    <div class="filters">
+      <label>Keresés
+        <input id="search" type="search" placeholder="Cím, szerző vagy címke">
+      </label>
+      <label>Szűrő
+        <select id="filter">
+          <option value="all">Mind</option>
+          <option value="unread">Olvasatlan</option>
+          <option value="reading">Olvasom</option>
+          <option value="completed">Befejezve</option>
+          <option value="paused">Félbehagyva</option>
+          <option value="favorite">Kedvencek</option>
+          <option value="followed">Követett</option>
+        </select>
+      </label>
+    </div>
+    <div id="book-list"></div>
+    <div class="empty" id="empty">Még nincs könyv. A Hozzáadás fülön tölthetsz be fájlt.</div>
+  </section>
+
+  <!-- HOZZÁADÁS -->
+  <section class="page" id="page-add">
+    <h2>Hozzáadás</h2>
+
+    <div class="card">
+      <h3>EPUB vagy HTML betöltése</h3>
+      <p class="muted small">Több fájlt is kijelölhetsz egyszerre. Ha a fic már a könyvtárban van, csak az új fejezeteket fűzi hozzá, a régiek megmaradnak.</p>
+      <label class="file-label">Fájl(ok)
+        <input id="epub-input" type="file" multiple>
+      </label>
+      <p class="status" id="import-status" data-type=""></p>
+    </div>
+
+    <div class="card">
+      <h3>AO3 link</h3>
+      <p class="muted small" id="ao3-note">Ez akkor kapcsol be, ha a Beállításokban megadod a Worker címét.</p>
+      <label>Fic linkje
+        <input id="ao3-url" type="url" placeholder="https://archiveofourown.org/works/..." disabled>
+      </label>
+      <div class="actions">
+        <button class="btn" id="ao3-add" type="button" disabled>Letöltés és követés</button>
+      </div>
+      <p class="status" id="ao3-status" data-type=""></p>
+    </div>
+
+    <div class="card">
+      <h3>Kézi hozzáadás</h3>
+      <p class="muted small">Olyan történethez, amit máshol olvasol, és csak nyilván akarod tartani.</p>
+      <form id="manual-form">
+        <label>Cím
+          <input id="manual-title" required placeholder="A történet címe">
+        </label>
+        <label>Szerző
+          <input id="manual-author" placeholder="Szerző neve">
+        </label>
+        <label>Webcím
+          <input id="manual-url" type="url" placeholder="https://...">
+        </label>
+        <div class="actions">
+          <button class="btn" type="submit">Hozzáadás</button>
+        </div>
+      </form>
+      <p class="status" id="manual-status" data-type=""></p>
+    </div>
+  </section>
+    <!-- BEÁLLÍTÁSOK -->
+  <section class="page" id="page-settings">
+    <h2>Beállítások</h2>
+
+    <div class="card">
+      <h3>AO3 Worker</h3>
+      <p class="muted small">A Cloudflare Worker címe, amin keresztül az app az AO3-ról tölt. Üresen hagyható.</p>
+      <label>Worker címe
+        <input id="worker-url" type="url" placeholder="https://neved.workers.dev">
+      </label>
+      <div class="actions">
+        <button class="btn" id="worker-save" type="button">Mentés</button>
+      </div>
+      <p class="status" id="settings-status" data-type=""></p>
+    </div>
+
+    <div class="card">
+      <h3>Mentés és visszatöltés</h3>
+      <p class="muted small">A könyvek és a fejezetek egy fájlba mentve, biztonsági másolatnak.</p>
+      <div class="actions">
+        <button class="btn" id="export-btn" type="button">Mentés fájlba</button>
+      </div>
+      <label class="file-label">Visszatöltés fájlból
+        <input id="import-file" type="file" accept="application/json,.json">
+      </label>
+      <p class="status" id="backup-status" data-type=""></p>
+    </div>
+
+    <div class="card">
+      <h3>Tárhely</h3>
+      <p class="muted small" id="storage-info">Tárhelyadat betöltése...</p>
+      <div class="actions">
+        <button class="btn ghost danger" id="wipe-all" type="button">Mindent töröl</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- OLVASÓ -->
+<div class="reader" id="reader" hidden>
+  <div class="reader-bar">
+    <button class="btn ghost" id="reader-back" type="button" aria-label="Vissza">←</button>
+    <div class="reader-title" id="reader-title"></div>
+  </div>
+  <div class="reader-body">
+    <label>Fejezet
+      <select id="chapter-select"></select>
+    </label>
+    <article id="chapter-content"></article>
+    <div class="actions reader-nav">
+      <button class="btn ghost" id="chapter-prev" type="button">← Előző</button>
+      <button class="btn" id="chapter-next" type="button">Következő →</button>
+    </div>
+  </div>
+</div>
+
+<nav class="tabs">
+  <button class="active" data-page="home" type="button"><span>🏠</span>Kezdőlap</button>
+  <button data-page="library" type="button"><span>📚</span>Könyvtár</button>
+  <button data-page="add" type="button"><span>➕</span>Hozzáadás</button>
+  <button data-page="settings" type="button"><span>⚙️</span>Beállítások</button>
+</nav>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="db.js"></script>
+<script src="epub.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
